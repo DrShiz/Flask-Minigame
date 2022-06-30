@@ -1,0 +1,21 @@
+body {
+    background-color: #0000004b;
+}
+
+.attack-target, .player-select {
+    width: fit-content;
+}
+
+.fight-form {
+    margin-left: 100px;
+    margin-top: 50px;
+}
+
+#player_hp, #enemy_hp {
+    width: fit-content;
+}
+
+#attack_button {
+    margin-top: 20px;
+    border-radius: 20px;
+}

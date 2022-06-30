@@ -1,0 +1,18 @@
+<head>
+    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+</head>
+
+{% block content %}
+    <div class="content">
+        {% block app_content %}
+
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}

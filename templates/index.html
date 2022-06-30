@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+    <form class="form" method="GET" action='{{ url_for("fight", enemy_class=enemy_class) }}'>
+        <h1>Welcome to Arena</h1>
+        <h2>Choose your hero:</h2>
+        <div>
+            {{form.player}}
+        </div>
+        <div>
+            <button class='btn btn-danger'>Fight</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+</script>
+{% endblock %}

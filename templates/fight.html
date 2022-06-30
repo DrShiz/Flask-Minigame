@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+    <form class="form fight-form" method="POST" action="/">
+        {{form.csrf_token()}}
+        <div>
+            <snap>Player: {{player}}</snap>
+        </div>
+        <div>
+            {{form.player_hp.label}}
+            {{form.player_hp}}
+        </div>
+        <div>
+            {{form.enemy_hp.label}}
+            {{form.enemy_hp}}
+        </div>
+        <div>
+            {{form.attack_target.label}}
+            {{form.attack_target}}
+        </div>
+        <div>
+            {{form.attack_button}}
+        </div>
+    </form>
+
+
+    <!-- Кнопка-триггер модального окна -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" hidden id="modal_button">
+    </button>
+  
+    <!-- Модальное окно -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">The Battle is over.</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stay"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+            <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay</button> -->
+            <button type="button" class="btn btn-primary" onclick="go_back()">Go back to arena's entrance</button>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    $(attack_button).attr('type','button');
+
+    $(player_hp).prop('disabled', true);
+    $(enemy_hp).prop('disabled', true);
+
+    $(player_hp).val('{{player.health}}');
+    $(enemy_hp).val('{{enemy.health}}');
+
+    function go_back() {
+        location.href = "{{ url_for('main') }}";
+    }
+
+
+
+    $(attack_button).click( () => {
+        $(attack_button).blur();
+        $.ajax({
+        url: '{{ url_for("fight", enemy_class=enemy) }}',
+        method: 'post',
+        data:$('form').serialize(),
+        success: function(data){
+            console.log(data);
+            $(player_hp).val(data.player_hp);
+            $(enemy_hp).val(data.enemy_hp);
+            if ($(player_hp).val() == 0 | $(enemy_hp).val() == 0) {
+                $(attack_button).prop('disabled', true);
+
+            if ($(player_hp).val() == 0) {
+                $('.modal-body').text('YOU LOSE');
+                $(modal_button).click();
+            } else if ($(enemy_hp).val() == 0) {
+                $(modal_button).click();
+                $('.modal-body').text('YOU WIN');
+    };
+    };
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    });
+    })
+
+
+</script>
+{% endblock %}
