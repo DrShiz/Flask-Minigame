@@ -2,24 +2,42 @@
 
 {% block app_content %}
     <form class="form fight-form" method="POST" action="/">
-        {{form.csrf_token()}}
-        <div>
-            <snap>Player: {{player}}</snap>
+        <div class="row">
+            <div class="col-3">
+                {{form.csrf_token()}}
+                <div>
+                    <snap>Player: {{player}}</snap>
+                </div>
+                <div>
+                    {{form.player_hp.label}}
+                    {{form.player_hp}}
+                </div>
+            </div>
+            <div class="col-6">
+                <snap id="player_dices">Your dices:</snap>
+                <snap id="enemy_dices">Enemy dices:</snap>
+                <br>
+                <snap id="whos_hit"></snap>
+                <br>
+                <span id="was_hit"></span>
+                <br>
+                <span id="hit"></span>
+            </div>
+            <div class="col-3">
+                <div>
+                    {{form.enemy_hp.label}}
+                    {{form.enemy_hp}}
+                </div>
+            </div>
+        <div class="row">
+            <div>
+                {{form.attack_target.label}}
+                {{form.attack_target}}
+            </div>
+            <div>
+                {{form.attack_button}}
+            </div>
         </div>
-        <div>
-            {{form.player_hp.label}}
-            {{form.player_hp}}
-        </div>
-        <div>
-            {{form.enemy_hp.label}}
-            {{form.enemy_hp}}
-        </div>
-        <div>
-            {{form.attack_target.label}}
-            {{form.attack_target}}
-        </div>
-        <div>
-            {{form.attack_button}}
         </div>
     </form>
 
@@ -74,6 +92,25 @@
             console.log(data);
             $(player_hp).val(data.player_hp);
             $(enemy_hp).val(data.enemy_hp);
+
+            $(player_dices).text('Your dices: ' + data.player_dices);
+            $(enemy_dices).text('Enemy dices: ' + data.enemy_dices);
+            if (data.player_dices > data.enemy_dices) {
+                $(whos_hit).text('Your win')
+            } else if (data.player_dices < data.enemy_dices) {
+                $(whos_hit).text('Enemy win')
+            } else {
+                $(whos_hit).text('Draw')
+            }
+            if (data.was_hit & data.hit > 0) {
+                $(was_hit).text('HIT!');
+            } else if (!data.was_hit){
+                $(was_hit).text('MISS!');
+            } else if (data.was_hit & data.hit == 0) {
+                $(was_hit).text('BLOCKED!');
+            }
+            $(hit).text(data.hit + ' points');
+
             if ($(player_hp).val() == 0 | $(enemy_hp).val() == 0) {
                 $(attack_button).prop('disabled', true);
 

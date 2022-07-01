@@ -1,4 +1,5 @@
 from threading import Lock
+from random import randrange
 
 
 characters = ['knight', 'magician', 'archer']
@@ -25,7 +26,14 @@ class SingletonMeta_enemy(type):
                 cls._instances[cls] = instance
         return cls._instances[cls]
 
-class Knight_player(metaclass=SingletonMeta_player):
+class BaseCharacter:
+    
+    def roll_the_dice(self):
+        return (randrange(1, 6), randrange(1, 6))
+
+    parts = ['head', 'body', 'hands', 'legs']
+
+class Knight_player(BaseCharacter, metaclass=SingletonMeta_player):
     def __init__(self):
         self.health = 150
         self.strength = 10
@@ -35,7 +43,7 @@ class Knight_player(metaclass=SingletonMeta_player):
     def __str__(self):
         return 'knight'
 
-class Magician_player(metaclass=SingletonMeta_player):
+class Magician_player(BaseCharacter, metaclass=SingletonMeta_player):
     def __init__(self):
         self.health = 70
         self.strength = 25
@@ -45,7 +53,7 @@ class Magician_player(metaclass=SingletonMeta_player):
     def __str__(self):
         return 'magician'
 
-class Archer_player(metaclass=SingletonMeta_player):
+class Archer_player(BaseCharacter, metaclass=SingletonMeta_player):
     def __init__(self):
         self.health = 100
         self.strength = 15
@@ -56,7 +64,7 @@ class Archer_player(metaclass=SingletonMeta_player):
         return 'archer'
 
 
-class Knight_enemy(metaclass=SingletonMeta_enemy):
+class Knight_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
     def __init__(self):
         self.health = 150
         self.strength = 10
@@ -66,7 +74,7 @@ class Knight_enemy(metaclass=SingletonMeta_enemy):
     def __str__(self):
         return 'knight'
 
-class Magician_enemy(metaclass=SingletonMeta_enemy):
+class Magician_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
     def __init__(self):
         self.health = 70
         self.strength = 25
@@ -76,7 +84,7 @@ class Magician_enemy(metaclass=SingletonMeta_enemy):
     def __str__(self):
         return 'magician'
 
-class Archer_enemy(metaclass=SingletonMeta_enemy):
+class Archer_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
     def __init__(self):
         self.health = 100
         self.strength = 15

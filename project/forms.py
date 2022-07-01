@@ -1,29 +1,31 @@
+from email.policy import default
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, SelectField, IntegerField, RadioField
+from wtforms import StringField, SubmitField, TextAreaField, SelectField, IntegerField, RadioField, FloatField
 from wtforms.validators import DataRequired, NumberRange
 
 
 class FightForm(FlaskForm):
-    player_hp = IntegerField('Your hp',
+    player_hp = FloatField('Your hp',
         validators=[NumberRange(min=0)],
         render_kw = {
             'class': "form-control"
         })
-    enemy_hp = IntegerField('Enemy hp',
+    enemy_hp = FloatField('Enemy hp',
         validators=[NumberRange(min=0)],
         render_kw = {
             'class': "form-control"
         })
-    your_points = IntegerField('Your points',
-        render_kw = {
-            'class': "form-control"
-        })
-    enemy_points = IntegerField('Enemy points',
-        render_kw = {
-            'class': "form-control"
-        })
-    attack_target = SelectField(
+    # your_points = IntegerField('Your points',
+    #     render_kw = {
+    #         'class': "form-control"
+    #     })
+    # enemy_points = IntegerField('Enemy points',
+    #     render_kw = {
+    #         'class': "form-control"
+    #     })
+    attack_target = RadioField(
         'What enemy part u wanna attack?',
+        default='head',
         choices=[
             ('head','head'),
             ('body','body'),
@@ -31,7 +33,7 @@ class FightForm(FlaskForm):
             ('legs','legs'),
         ],
         render_kw = {
-            'class': 'form-select attack-target'
+            'class': 'attack-target'
         }
     )
     attack_button = SubmitField(

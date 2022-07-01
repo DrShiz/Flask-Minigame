@@ -2,7 +2,7 @@ body {
     background-color: #0000004b;
 }
 
-.attack-target, .player-select {
+.player-select {
     width: fit-content;
 }
 
@@ -18,4 +18,8 @@ body {
 #attack_button {
     margin-top: 20px;
     border-radius: 20px;
+}
+
+.attack-target > li {
+    list-style: none;
 }
