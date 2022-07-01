@@ -34,7 +34,7 @@ class BaseCharacter:
         }
     }
 
-    inventory = []
+    inventory = {}
 
     def use_item(self, item):
 
@@ -44,13 +44,12 @@ class BaseCharacter:
 
 class Knight(BaseCharacter):
     def __init__(self):
-        self.inventory = []
         self.health = 150
         self.strength = 10
         self.max_health = 150
         self.max_strength = 10
-        hp_potion=HealthPotion(30)
-        self.inventory.append(hp_potion)
+        hp_potion=HealthPotion(1, 30)
+        self.inventory[hp_potion.id] = hp_potion
 
     def __str__(self):
         return 'Knight'
