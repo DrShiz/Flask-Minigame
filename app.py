@@ -91,7 +91,7 @@ def fight(enemy_class):
             was_hit=was_hit,
             hit=hit,
             player = jsonpickle.encode(player, unpicklable=True),
-            enemy = jsonpickle.encode(player, unpicklable=True), 
+            enemy = jsonpickle.encode(enemy, unpicklable=True), 
         )
 
     return render_template(

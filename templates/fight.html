@@ -213,13 +213,14 @@
                     console.log(data);
 
                     let player = JSON.parse(data.player)
+                    console.log(player)
 
                     $(player_hp).val(player.health);
                     $(player_hp_progressbar).attr('aria-valuenow', player.health);
                     $(player_hp_progressbar).width((player.health / player.max_health) * 100 + '%');
                     $(player_hp_progressbar).text(player.health);
 
-                    $('item_id_'+item_id).remove();
+                    $(`#item_id_${item_id}`).remove();
                 },
                 error: function(data) {
                     console.log(data);

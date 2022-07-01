@@ -64,6 +64,8 @@ class Knight(BaseCharacter):
         self.max_strength = 10
         hp_potion=HealthPotion(30)
         self.inventory = super().inventory
+        self.inventory['items'] = {}
+        self.inventory['meta']['next_itemid'] = 1
         self.attack_target = super().attack_target
         self.add_item_to_inventory(hp_potion)
 
