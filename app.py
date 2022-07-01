@@ -17,31 +17,36 @@ def main():
     global enemy
 
     enemy_class = random.choice(characters)
+    enemy = characters[enemy_class]
     if enemy_class == 'Knight':
-        enemy = Knight_enemy()
+        enemy = Knight()
     elif enemy_class == 'Magician':
-        enemy = Magician_enemy()
+        enemy = Magician()
     elif enemy_class == 'Archer':
-        enemy = Archer_enemy()
-
-    try:
-        player.health = player.max_health
-        enemy.health = enemy.max_health
-    except:
-        pass
+        enemy = Archer()
 
     if request.method == 'POST':
         player = form.player.data
         if player == 'Knight':
-            player = Knight_player()
+            player = Knight()
         elif player == 'Magician':
-            player = Magician_player()
+            player = Magician()
         elif player == 'Archer':
-            player = Archer_player()
+            player = Archer()
         return redirect(url_for("fight", enemy_class=enemy_class))
         
     return render_template('index.html', enemy_class=enemy_class, form=form)
 
+
+@app.route('/use_item/', methods=['POST'])
+def use_item():
+    player.inventory[0].use(player)
+    return jsonify(
+            player_hp=player.health, 
+            enemy_hp=enemy.health,
+            player_max_hp=player.max_health, 
+            enemy_max_hp=enemy.max_health
+        )
 
 @app.route('/fight/enemy:<enemy_class>/', methods=['GET', 'POST'])
 def fight(enemy_class):

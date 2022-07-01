@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
+<div style="color: black;">
     <form class="form" method="POST" action='{{ url_for("main") }}'>
         <h1>Welcome to Arena</h1>
         <h2>Choose your hero:</h2>
@@ -11,22 +12,11 @@
             <button class='btn btn-danger' id="fight-button">Fight</button>
         </div>
     </form>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // $(fight-button).click( () => {
-    //     $.ajax({
-    //     url: '{{ url_for("main") }}',
-    //     method: 'POST',
-    //     data:$('form').serialize(),
-    //     success: function(data){
-    //         console.log(data);
-    //         },
-    //         error: function(data) {
-    //             console.log(data);
-    //         }
-    //     });
-    // });
+
 </script>
 {% endblock %}

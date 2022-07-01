@@ -19,6 +19,11 @@
                     <div class='character_img'>
                         <img src="{{ url_for('static', filename='media/'+player.__str__()+'.jpg') }}" alt="">
                     </div>
+                    <div id="inventory">
+                    {% for item in player.inventory %}
+                        <img src="{{ url_for('static', filename='media/') }}{{ item.icon }}" alt="" style="height:40px;" id="hp_potion">
+                    {% endfor %}
+                    </div>
                 </div>
             </div>
             <div class="col-4">
@@ -197,6 +202,26 @@
 
     });
 
+    $(hp_potion).click( () => {
+        $.ajax({
+                url: '{{ url_for("use_item") }}',
+                method: 'post',
+                data:{},
+                success: function(data){
+                    $(player_hp).val(data.player_hp);
+                    $(enemy_hp).val(data.enemy_hp);
+                    $(player_hp_progressbar).attr('aria-valuenow', data.player_hp);
+                    $(player_hp_progressbar).width((data.player_hp / data.player_max_hp) * 100 + '%');
+                    $(player_hp_progressbar).text(data.player_hp);
+                    $(enemy_hp_progressbar).attr('aria-valuenow', data.enemy_hp);
+                    $(enemy_hp_progressbar).width((data.enemy_hp / data.enemy_max_hp) * 100 + '%');
+                    $(enemy_hp_progressbar).text(data.enemy_hp);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+    })
 
 </script>
 {% endblock %}
@@ -205,7 +230,7 @@
 <style>
     body {
         background: url({{ url_for('static', filename='media/arena.jpg') }})  no-repeat;
-        background-size: 100%;
+        background-size: 100% 100%;
     }
 </style>
 {% endblock %}

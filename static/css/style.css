@@ -1,3 +1,7 @@
+.content {
+    color: white;
+}
+
 .player-select {
     width: fit-content;
 }
@@ -33,5 +37,11 @@
 .character_img img {
     width: inherit;
     height: inherit;
-    border: 4px #eb5f3385 solid;
+    border: 4px #00000085 solid;
+    border-radius: 10px;
+}
+
+.progress {
+    border: 2px solid #000000db;
+    border-radius: 10px;
 }
