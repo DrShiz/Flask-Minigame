@@ -2,13 +2,11 @@ from flask import url_for
 
 
 class BaseItem:
-    def __init__(self, id):
-        self.id = id
+    id = 0
 
 class HealthPotion(BaseItem):
 
-    def __init__(self, id, size):
-        super().__init__(id)
+    def __init__(self, size):
         self.size = size
 
     icon = 'hp_potion.png'

@@ -3,6 +3,8 @@ from project.forms import FightForm
 from project.characters import *
 from random import randrange
 import random
+import jsonpickle
+import json
 
 
 app = Flask(__name__)
@@ -32,6 +34,7 @@ def main():
             player = Magician()
         elif player_class == 'Archer':
             player = Archer()
+
         return redirect(url_for("fight", enemy_class=enemy_class))
         
     return render_template('index.html', enemy_class=enemy_class, form=form)
@@ -39,12 +42,11 @@ def main():
 
 @app.route('/use_item/', methods=['POST'])
 def use_item():
-    player.inventory[1].use(player)
+    item_id = request.json['item_id']
+    player.inventory['items'][item_id].use(player)
+    player.inventory['items'].pop(item_id, None)
     return jsonify(
-            player_hp=player.health, 
-            enemy_hp=enemy.health,
-            player_max_hp=player.max_health, 
-            enemy_max_hp=enemy.max_health
+        player=jsonpickle.encode(player, unpicklable=True),
         )
 
 @app.route('/fight/enemy:<enemy_class>/', methods=['GET', 'POST'])
@@ -53,44 +55,43 @@ def fight(enemy_class):
     form = FightForm()
 
     if request.method == 'POST':
+        # print(json.dumps(player))
 
-        player_attack_target = form.player_attack_target.data
-        player_dices = player.roll_the_dice()
-        enemy_dices = enemy.roll_the_dice()
+        player.attack_target = form.player_attack_target.data
+        player.roll_the_dice()
+        enemy.roll_the_dice()
         
-        enemy_attack_target = random.choice(list(player.parts.keys()))
+        enemy.attack_target = random.choice(list(player.parts.keys()))
 
         def make_a_hit(winner, looser, attacked_part):
             was_hit = False
             hit = 0
-            if randrange(1,10) in range(1, int(looser.parts[player_attack_target]['chance']*10)):
+            if randrange(1,10) in range(1, int(looser.parts[player.attack_target]['chance']*10)):
                 was_hit = True
             if was_hit:
-                hit = winner.strength * abs((sum(player_dices) - sum(enemy_dices))) * looser.parts[attacked_part]['criticality']
+                hit = winner.strength * (sum(winner.dices) - sum(looser.dices)) * looser.parts[attacked_part]['criticality']
+                if winner.dices[0] == winner.dices[1]:
+                    hit *= 2
                 looser.health -= hit
                 if looser.health < 0:
                     looser.health = 0
 
             return (was_hit, hit)
 
-        if sum(player_dices) > sum(enemy_dices):
-            (was_hit, hit) = make_a_hit(player, enemy, player_attack_target)
-        elif sum(player_dices) < sum(enemy_dices):
-            (was_hit, hit) = make_a_hit(enemy, player, enemy_attack_target)
+        if sum(player.dices) > sum(enemy.dices):
+            (was_hit, hit) = make_a_hit(player, enemy, player.attack_target)
+        elif sum(player.dices) < sum(enemy.dices):
+            (was_hit, hit) = make_a_hit(enemy, player, enemy.attack_target)
         else:
             (was_hit, hit) = (True, 0)
     
+
+
         return jsonify(
-            player_dices=player_dices, 
-            enemy_dices=enemy_dices,
-            enemy_attack_target=enemy_attack_target,
-            player_attack_target=player_attack_target,
             was_hit=was_hit,
-            hit=hit, 
-            player_hp=player.health, 
-            enemy_hp=enemy.health,
-            player_max_hp=player.max_health, 
-            enemy_max_hp=enemy.max_health
+            hit=hit,
+            player = jsonpickle.encode(player, unpicklable=True),
+            enemy = jsonpickle.encode(player, unpicklable=True), 
         )
 
     return render_template(

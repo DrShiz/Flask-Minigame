@@ -20,8 +20,8 @@
                         <img src="{{ url_for('static', filename='media/'+player.__str__()+'.jpg') }}" alt="">
                     </div>
                     <div id="inventory">
-                    {% for item in player.inventory.values() %}
-                        <img src="{{ url_for('static', filename='media/') }}{{ item.icon }}" alt="" style="height:40px;" id="hp_potion">
+                    {% for item in player.inventory['items'].values() %}
+                        <img src="{{ url_for('static', filename='media/') }}{{ item.icon }}" alt="" id='item_id_{{item.id}}' style="height:40px;" onclick=useItem({{item.id}})>
                     {% endfor %}
                     </div>
                 </div>
@@ -141,30 +141,30 @@
             data:$('form').serialize(),
             success: function(data){
                 console.log(data);
-                $(player_hp).val(data.player_hp);
-                $(enemy_hp).val(data.enemy_hp);
-                $(player_hp_progressbar).attr('aria-valuenow', data.player_hp);
-                $(player_hp_progressbar).width((data.player_hp / data.player_max_hp) * 100 + '%');
-                $(player_hp_progressbar).text(data.player_hp);
-                $(enemy_hp_progressbar).attr('aria-valuenow', data.enemy_hp);
-                $(enemy_hp_progressbar).width((data.enemy_hp / data.enemy_max_hp) * 100 + '%');
-                $(enemy_hp_progressbar).text(data.enemy_hp);
+                let player = JSON.parse(data.player)
+                let enemy = JSON.parse(data.enemy)
+
+                $(player_hp).val(player.health);
+                $(enemy_hp).val(enemy.health);
+                $(player_hp_progressbar).attr('aria-valuenow', player.health);
+                $(player_hp_progressbar).width((player.health / player.max_health) * 100 + '%');
+                $(player_hp_progressbar).text(player.health);
+                $(enemy_hp_progressbar).attr('aria-valuenow', enemy.health);
+                $(enemy_hp_progressbar).width((enemy.health / enemy.max_health) * 100 + '%');
+                $(enemy_hp_progressbar).text(enemy.health);
+
+                $(player_dice_1).attr('src', media_path + 'dice_' + player.dices[0] + '.png')
+                $(player_dice_2).attr('src', media_path + 'dice_' + player.dices[1] + '.png')
+                $(enemy_dice_1).attr('src', media_path + 'dice_' + enemy.dices[0] + '.png')
+                $(enemy_dice_2).attr('src', media_path + 'dice_' + enemy.dices[1] + '.png')
 
 
-                // $(player_dices).text('Your dices: ' + data.player_dices);
-                $(player_dice_1).attr('src', media_path + 'dice_' + data.player_dices[0] + '.png')
-                $(player_dice_2).attr('src', media_path + 'dice_' + data.player_dices[1] + '.png')
-                $(enemy_dice_1).attr('src', media_path + 'dice_' + data.enemy_dices[0] + '.png')
-                $(enemy_dice_2).attr('src', media_path + 'dice_' + data.enemy_dices[1] + '.png')
-
-
-                // $(enemy_dices).text('Enemy dices: ' + data.enemy_dices);
-                if (data.player_dices.reduce((a,b)=>a+b) > data.enemy_dices.reduce((a,b)=>a+b)) {
+                if (player.dices_sum > enemy.dices_sum) {
                     $(whos_hit).text('Your win');
-                    $(target).text(data.player_attack_target + '  |');
-                } else if (data.player_dices.reduce((a,b)=>a+b) < data.enemy_dices.reduce((a,b)=>a+b)) {
+                    $(target).text(player.attack_target + '  |');
+                } else if (player.dices_sum < enemy.dices_sum) {
                     $(whos_hit).text('Enemy win');
-                    $(target).text(data.enemy_attack_target + '  |');
+                    $(target).text(enemy.attack_target + '  |');
                 } else {
                     $(whos_hit).text('Draw');
                 }
@@ -202,24 +202,30 @@
 
     });
 
-    $(hp_potion).click( () => {
+    function useItem(item_id) {
         $.ajax({
                 url: '{{ url_for("use_item") }}',
                 method: 'post',
-                data:{},
+                contentType: "application/json",
+                data:JSON.stringify({'item_id': item_id}),
+                dataType: "json",
                 success: function(data){
-                    $(player_hp).val(data.player_hp);
-                    $(player_hp_progressbar).attr('aria-valuenow', data.player_hp);
-                    $(player_hp_progressbar).width((data.player_hp / data.player_max_hp) * 100 + '%');
-                    $(player_hp_progressbar).text(data.player_hp);
+                    console.log(data);
 
-                    $('#inventory > img').remove();
+                    let player = JSON.parse(data.player)
+
+                    $(player_hp).val(player.health);
+                    $(player_hp_progressbar).attr('aria-valuenow', player.health);
+                    $(player_hp_progressbar).width((player.health / player.max_health) * 100 + '%');
+                    $(player_hp_progressbar).text(player.health);
+
+                    $('item_id_'+item_id).remove();
                 },
                 error: function(data) {
                     console.log(data);
                 }
             });
-    })
+    };
 
 </script>
 {% endblock %}
