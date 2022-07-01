@@ -17,16 +17,16 @@ def main():
     global enemy
 
     enemy_class = random.choice(characters)
-    if enemy_class == 'knight':
+    if enemy_class == 'Knight':
         enemy = Knight_enemy()
-    elif enemy_class == 'magician':
+    elif enemy_class == 'Magician':
         enemy = Magician_enemy()
-    elif enemy_class == 'archer':
+    elif enemy_class == 'Archer':
         enemy = Archer_enemy()
-    enemy.health = enemy.max_health
 
     try:
         player.health = player.max_health
+        enemy.health = enemy.max_health
     except:
         pass
 
@@ -49,32 +49,20 @@ def fight(enemy_class):
     form = FightForm()
 
     if request.method == 'POST':
-        chances = {
-            'head': 0.7,
-            'body': 0.9,
-            'hands': 0.4,
-            'legs': 0.6
-        }
-        hit_strength = {
-            'head': 1,
-            'body': 0.8,
-            'hands': 0.3,
-            'legs': 0.5
-        }
 
-        attack_target = form.attack_target.data
+        player_attack_target = form.player_attack_target.data
         player_dices = player.roll_the_dice()
         enemy_dices = enemy.roll_the_dice()
         
-        attacked_by_enemy = random.choice(player.parts)
+        enemy_attack_target = random.choice(list(player.parts.keys()))
 
         def make_a_hit(winner, looser, attacked_part):
             was_hit = False
             hit = 0
-            if randrange(1,10) in range(1, int(chances[attack_target]*10)):
+            if randrange(1,10) in range(1, int(looser.parts[player_attack_target]['chance']*10)):
                 was_hit = True
             if was_hit:
-                hit = winner.strength * abs((sum(player_dices) - sum(enemy_dices))) * hit_strength[attacked_part]
+                hit = winner.strength * abs((sum(player_dices) - sum(enemy_dices))) * looser.parts[attacked_part]['criticality']
                 looser.health -= hit
                 if looser.health < 0:
                     looser.health = 0
@@ -82,20 +70,23 @@ def fight(enemy_class):
             return (was_hit, hit)
 
         if sum(player_dices) > sum(enemy_dices):
-            (was_hit, hit) = make_a_hit(player, enemy, attack_target)
+            (was_hit, hit) = make_a_hit(player, enemy, player_attack_target)
         elif sum(player_dices) < sum(enemy_dices):
-            (was_hit, hit) = make_a_hit(enemy, player, attacked_by_enemy)
+            (was_hit, hit) = make_a_hit(enemy, player, enemy_attack_target)
         else:
             (was_hit, hit) = (True, 0)
     
         return jsonify(
             player_dices=player_dices, 
             enemy_dices=enemy_dices,
-            attacked_by_enemy=attacked_by_enemy,
+            enemy_attack_target=enemy_attack_target,
+            player_attack_target=player_attack_target,
             was_hit=was_hit,
             hit=hit, 
             player_hp=player.health, 
-            enemy_hp=enemy.health
+            enemy_hp=enemy.health,
+            player_max_hp=player.max_health, 
+            enemy_max_hp=enemy.max_health
         )
 
     return render_template(

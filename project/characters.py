@@ -2,7 +2,7 @@ from threading import Lock
 from random import randrange
 
 
-characters = ['knight', 'magician', 'archer']
+characters = ['Knight', 'Magician', 'Archer']
 
 class SingletonMeta_player(type):
     _instances = {}
@@ -26,12 +26,30 @@ class SingletonMeta_enemy(type):
                 cls._instances[cls] = instance
         return cls._instances[cls]
 
+
 class BaseCharacter:
     
     def roll_the_dice(self):
         return (randrange(1, 6), randrange(1, 6))
 
-    parts = ['head', 'body', 'hands', 'legs']
+    parts = {
+        'Head': {
+            'chance': 0.7,
+            'criticality': 1
+        }, 
+        'Body': {
+            'chance': 0.9,
+            'criticality': 0.8
+        }, 
+        'Hands': {
+            'chance': 0.4,
+            'criticality': 0.3
+        }, 
+        'Legs': {
+            'chance': 0.6,
+            'criticality': 0.5
+        }
+    }
 
 class Knight_player(BaseCharacter, metaclass=SingletonMeta_player):
     def __init__(self):
@@ -41,7 +59,7 @@ class Knight_player(BaseCharacter, metaclass=SingletonMeta_player):
         self.max_strength = 10
 
     def __str__(self):
-        return 'knight'
+        return 'Knight'
 
 class Magician_player(BaseCharacter, metaclass=SingletonMeta_player):
     def __init__(self):
@@ -51,7 +69,7 @@ class Magician_player(BaseCharacter, metaclass=SingletonMeta_player):
         self.max_strength = 25
 
     def __str__(self):
-        return 'magician'
+        return 'Magician'
 
 class Archer_player(BaseCharacter, metaclass=SingletonMeta_player):
     def __init__(self):
@@ -61,7 +79,7 @@ class Archer_player(BaseCharacter, metaclass=SingletonMeta_player):
         self.max_strength = 15
 
     def __str__(self):
-        return 'archer'
+        return 'Archer'
 
 
 class Knight_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
@@ -72,7 +90,7 @@ class Knight_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
         self.max_strength = 10
 
     def __str__(self):
-        return 'knight'
+        return 'Knight'
 
 class Magician_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
     def __init__(self):
@@ -82,7 +100,7 @@ class Magician_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
         self.max_strength = 25
 
     def __str__(self):
-        return 'magician'
+        return 'Magician'
 
 class Archer_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
     def __init__(self):
@@ -92,4 +110,4 @@ class Archer_enemy(BaseCharacter, metaclass=SingletonMeta_enemy):
         self.max_strength = 15
 
     def __str__(self):
-        return 'archer'
+        return 'Archer'

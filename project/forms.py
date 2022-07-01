@@ -5,12 +5,12 @@ from wtforms.validators import DataRequired, NumberRange
 
 
 class FightForm(FlaskForm):
-    player_hp = FloatField('Your hp',
+    player_hp = FloatField('HP',
         validators=[NumberRange(min=0)],
         render_kw = {
             'class': "form-control"
         })
-    enemy_hp = FloatField('Enemy hp',
+    enemy_hp = FloatField('HP',
         validators=[NumberRange(min=0)],
         render_kw = {
             'class': "form-control"
@@ -23,14 +23,14 @@ class FightForm(FlaskForm):
     #     render_kw = {
     #         'class': "form-control"
     #     })
-    attack_target = RadioField(
+    player_attack_target = RadioField(
         'What enemy part u wanna attack?',
-        default='head',
+        default='Head',
         choices=[
-            ('head','head'),
-            ('body','body'),
-            ('hands','hands'),
-            ('legs','legs'),
+            ('Head','Head'),
+            ('Body','Body'),
+            ('Hands','Hands'),
+            ('Legs','Legs'),
         ],
         render_kw = {
             'class': 'attack-target'

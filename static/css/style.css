@@ -1,7 +1,3 @@
-body {
-    background-color: #0000004b;
-}
-
 .player-select {
     width: fit-content;
 }
@@ -22,4 +18,20 @@ body {
 
 .attack-target > li {
     list-style: none;
+}
+
+.modal {
+    --bs-border-color: transparent;
+}
+
+.character_img {
+    width: 350px;
+    height: 700px;
+    margin-top: 20px;
+}
+
+.character_img img {
+    width: inherit;
+    height: inherit;
+    border: 4px #eb5f3385 solid;
 }

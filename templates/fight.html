@@ -3,7 +3,7 @@
 {% block app_content %}
     <form class="form fight-form" method="POST" action="/">
         <div class="row">
-            <div class="col-3">
+            <div class="col-4">
                 {{form.csrf_token()}}
                 <div>
                     <snap>Player: {{player}}</snap>
@@ -11,37 +11,62 @@
                 <div>
                     {{form.player_hp.label}}
                     {{form.player_hp}}
+                    <div class="progress" style="height: 40px;width: 350px;">
+                        <div class="progress-bar progress-bar-striped bg-danger progress-bar-animated" role="progressbar" 
+                        style="width: 100%" aria-valuenow="" aria-valuemin="0" aria-valuemax="" 
+                        id="player_hp_progressbar"></div>
+                    </div>
+                    <div class='character_img'>
+                        <img src="{{ url_for('static', filename='media/'+player.__str__()+'.jpg') }}" alt="">
+                    </div>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-4">
                 <snap id="player_dices">Your dices:</snap>
+                <img src="{{ url_for('static', filename='media/dice_0.png') }}" alt="" id="player_dice_1" style="width: 50px;">
+                <img src="{{ url_for('static', filename='media/dice_0.png') }}" alt="" id="player_dice_2" style="width: 50px;">
                 <snap id="enemy_dices">Enemy dices:</snap>
+                <img src="{{ url_for('static', filename='media/dice_0.png') }}" alt="" id="enemy_dice_1" style="width: 50px;">
+                <img src="{{ url_for('static', filename='media/dice_0.png') }}" alt="" id="enemy_dice_2" style="width: 50px;">
                 <br>
-                <snap id="whos_hit"></snap>
                 <br>
-                <span id="was_hit"></span>
+                <snap id="whos_hit" style="margin-left: 150px;"></snap>
                 <br>
-                <span id="hit"></span>
+                <span id="target" style="margin-left: 150px;"></span><span id="was_hit"></span>
+                <br>
+                <span id="hit" style="margin-left: 150px;"></span>
+                <br>
+                <img src="{{ url_for('static', filename='media/dices.gif') }}" alt="" hidden id="dices_gif" style="margin-left: 120px;">
+                <br>
+                <div>
+                    {{form.player_attack_target.label}}
+                    {{form.player_attack_target}}
+                </div>
+                <div>
+                    {{form.attack_button}}
+                </div>
             </div>
-            <div class="col-3">
+            <div class="col-4">
+                <div>
+                    <snap>Enemy: {{enemy}}</snap>
+                </div>
                 <div>
                     {{form.enemy_hp.label}}
                     {{form.enemy_hp}}
+                    <div class="progress" style="height: 40px;width: 350px;">
+                        <div class="progress-bar progress-bar-striped bg-danger progress-bar-animated" role="progressbar" 
+                        style="width: 100%" aria-valuenow="" aria-valuemin="0" aria-valuemax="" 
+                        id="enemy_hp_progressbar"></div>
+                    </div>
+                    <div class='character_img'>
+                        <img src="{{ url_for('static', filename='media/'+enemy.__str__()+'.jpg') }}" alt="">
+                    </div>
                 </div>
             </div>
-        <div class="row">
-            <div>
-                {{form.attack_target.label}}
-                {{form.attack_target}}
-            </div>
-            <div>
-                {{form.attack_button}}
-            </div>
-        </div>
         </div>
     </form>
 
-
+    
     <!-- Кнопка-триггер модального окна -->
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" hidden id="modal_button">
     </button>
@@ -49,26 +74,44 @@
     <!-- Модальное окно -->
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="background-image:url({{ url_for('static', filename='media/modal.jpg') }});">
             <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">The Battle is over.</h5>
+            <h5 class="modal-title" id="staticBackdropLabel" style="font-size: 25px;"><b>The Battle is over.</b></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stay"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="text-align: center;
+            font-size: 55px;
+            color: #842029;
+            -webkit-text-stroke: 2px black;">
             </div>
             <div class="modal-footer">
             <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stay</button> -->
-            <button type="button" class="btn btn-primary" onclick="go_back()">Go back to arena's entrance</button>
+            <button type="button" class="btn btn-success" onclick="go_back()">Go back to arena's entrance</button>
             </div>
         </div>
         </div>
     </div>
+
+
 {% endblock %}
 
 {% block scripts %}
 <script>
+    let media_path = "{{ url_for('static', filename='media/') }}";
+
+    $(player_hp_progressbar).attr('aria-valuemax', {{player.max_health}});
+    $(player_hp_progressbar).attr('aria-valuenow', {{player.health}});
+    $(player_hp_progressbar).width(({{player.health}} / {{player.max_health}}) * 100 + '%');
+    $(player_hp_progressbar).text({{player.health}});
+    $(enemy_hp_progressbar).attr('aria-valuemax', {{enemy.max_health}});
+    $(enemy_hp_progressbar).attr('aria-valuenow', {{enemy.health}});
+    $(enemy_hp_progressbar).width(({{enemy.health}} / {{enemy.max_health}}) * 100 + '%');
+    $(enemy_hp_progressbar).text({{enemy.health}});
 
     $(attack_button).attr('type','button');
+
+    $(player_hp).prop('hidden', true);
+    $(enemy_hp).prop('hidden', true);
 
     $(player_hp).prop('disabled', true);
     $(enemy_hp).prop('disabled', true);
@@ -84,51 +127,85 @@
 
     $(attack_button).click( () => {
         $(attack_button).blur();
-        $.ajax({
-        url: '{{ url_for("fight", enemy_class=enemy) }}',
-        method: 'post',
-        data:$('form').serialize(),
-        success: function(data){
-            console.log(data);
-            $(player_hp).val(data.player_hp);
-            $(enemy_hp).val(data.enemy_hp);
+        $(dices_gif).prop('hidden', false);
 
-            $(player_dices).text('Your dices: ' + data.player_dices);
-            $(enemy_dices).text('Enemy dices: ' + data.enemy_dices);
-            if (data.player_dices > data.enemy_dices) {
-                $(whos_hit).text('Your win')
-            } else if (data.player_dices < data.enemy_dices) {
-                $(whos_hit).text('Enemy win')
-            } else {
-                $(whos_hit).text('Draw')
+        setTimeout(() => {
+            $.ajax({
+            url: '{{ url_for("fight", enemy_class=enemy) }}',
+            method: 'post',
+            data:$('form').serialize(),
+            success: function(data){
+                console.log(data);
+                $(player_hp).val(data.player_hp);
+                $(enemy_hp).val(data.enemy_hp);
+                $(player_hp_progressbar).attr('aria-valuenow', data.player_hp);
+                $(player_hp_progressbar).width((data.player_hp / data.player_max_hp) * 100 + '%');
+                $(player_hp_progressbar).text(data.player_hp);
+                $(enemy_hp_progressbar).attr('aria-valuenow', data.enemy_hp);
+                $(enemy_hp_progressbar).width((data.enemy_hp / data.enemy_max_hp) * 100 + '%');
+                $(enemy_hp_progressbar).text(data.enemy_hp);
+
+
+                // $(player_dices).text('Your dices: ' + data.player_dices);
+                $(player_dice_1).attr('src', media_path + 'dice_' + data.player_dices[0] + '.png')
+                $(player_dice_2).attr('src', media_path + 'dice_' + data.player_dices[1] + '.png')
+                $(enemy_dice_1).attr('src', media_path + 'dice_' + data.enemy_dices[0] + '.png')
+                $(enemy_dice_2).attr('src', media_path + 'dice_' + data.enemy_dices[1] + '.png')
+
+
+                // $(enemy_dices).text('Enemy dices: ' + data.enemy_dices);
+                if (data.player_dices.reduce((a,b)=>a+b) > data.enemy_dices.reduce((a,b)=>a+b)) {
+                    $(whos_hit).text('Your win');
+                    $(target).text(data.player_attack_target + '  |');
+                } else if (data.player_dices.reduce((a,b)=>a+b) < data.enemy_dices.reduce((a,b)=>a+b)) {
+                    $(whos_hit).text('Enemy win');
+                    $(target).text(data.enemy_attack_target + '  |');
+                } else {
+                    $(whos_hit).text('Draw');
+                }
+                if (data.was_hit & data.hit > 0) {
+                    $(was_hit).text('  HIT!');
+                } else if (!data.was_hit){
+                    $(was_hit).text('  MISS!');
+                } else if (data.was_hit & data.hit == 0) {
+                    $(was_hit).text('  BLOCKED!');
+                };
+
+                $(hit).text(data.hit + ' points');
+
+                if ($(player_hp).val() == 0 | $(enemy_hp).val() == 0) {
+                    $(attack_button).prop('disabled', true);
+
+                    if ($(player_hp).val() == 0) {
+                        $('.modal-body').text('YOU LOSE');
+                        $('.modal-body').css('color', '#842029')
+                        $(modal_button).click();
+                    } else if ($(enemy_hp).val() == 0) {
+                        $(modal_button).click();
+                        $('.modal-body').text('YOU WIN');
+                        $('.modal-body').css('color', '#20843f')
+                    };
+                };
+
+                $(dices_gif).prop('hidden', true);
+            },
+            error: function(data) {
+                console.log(data);
             }
-            if (data.was_hit & data.hit > 0) {
-                $(was_hit).text('HIT!');
-            } else if (!data.was_hit){
-                $(was_hit).text('MISS!');
-            } else if (data.was_hit & data.hit == 0) {
-                $(was_hit).text('BLOCKED!');
-            }
-            $(hit).text(data.hit + ' points');
+        });
+        }, 500);
 
-            if ($(player_hp).val() == 0 | $(enemy_hp).val() == 0) {
-                $(attack_button).prop('disabled', true);
-
-            if ($(player_hp).val() == 0) {
-                $('.modal-body').text('YOU LOSE');
-                $(modal_button).click();
-            } else if ($(enemy_hp).val() == 0) {
-                $(modal_button).click();
-                $('.modal-body').text('YOU WIN');
-    };
-    };
-        },
-        error: function(data) {
-            console.log(data);
-        }
     });
-    })
 
 
 </script>
+{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background: url({{ url_for('static', filename='media/arena.jpg') }})  no-repeat;
+        background-size: 100%;
+    }
+</style>
 {% endblock %}
